@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - FBX loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	
+	</head>
+
+	<body>
+		
+
+		<script src="js/three.js"></script>
+		
+		<script src="js/inflate.min.js"></script>
+
+		<script src="js/FBXLoader.js"></script>
+
+		<script src="js/OrbitControls.js"></script>
+
+		<script src="js/WebGL.js"></script>
+		<script src="js/stats.min.js"></script>
+
+		<script>
+if ( WEBGL.isWebGLAvailable() === false ) {
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			}
+			var container, stats, controls;
+			var camera, scene, renderer, light;
+			var clock = new THREE.Clock();
+			var mixer;
+			var keyPressed;
+		
+
+			
+			init();
+			animate();
+
+			var mouse = new THREE.Vector3(0, 0, 9.996);
+			function setMouseVector (event){
+				mouse.x = (event.clientX / window.innerWidth) * 2 -1;
+				mouse.y =  -(event.clientY / window.innerHeight) * 2 -1;
+			}
+			window.addEventListener("mousemove", setMouseVector);
+			function show() {
+				console.log(mouse.x + ", " + mouse.y);
+			}
+			setInterval(show, 1000);
+			function init() {
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0, 30, 300 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+				scene.fog = new THREE.Fog( 0xffffff , 200, 100 );
+				light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				light.position.set( 0, 200, 0 );
+				scene.add( light );
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 200, 100 );
+				light.castShadow = true;
+				light.shadow.camera.top = 180;
+				light.shadow.camera.bottom = - 100;
+				light.shadow.camera.left = - 120;
+				light.shadow.camera.right = 120;
+				scene.add( light );
+				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// ground
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x709AA5, depthWrite: false } ) );
+				mesh.rotation.x = - Math.PI / 2;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+				var grid = new THREE.GridHelper( 1000, 20, 0x93C54B, 0x93C54B );
+				grid.material.opacity = 0.2;
+				grid.material.transparent = true;
+				scene.add( grid );
+
+				
+				var loader = new THREE.FBXLoader();
+				loader.load( 'models/show.fbx', function ( object ) {
+					
+					object.traverse( function ( child ) {
+					} );
+					object.position.y = 100
+					object.traverse( function ( child ) {
+					} );
+					object.position.y = 2;
+					object.position.x = 50;
+					object.scale.x = 10;
+					object.scale.y = 20;
+					object.scale.z = 20;
+					scene.add( object );
+				} );
+				//Lambo model
+				var loader = new THREE.FBXLoader();
+				loader.load( 'models/lamboo.fbx', function ( object ) {
+					object.traverse( function ( child ) {
+					} );
+					object.position.y = 13;
+					object.position.x = 22;
+					 object.scale.x = 0.5;
+					 object.scale.y = 0.5;
+					 object.scale.z = 0.5;
+					scene.add( object );
+				} );
+				///Sequoia model
+				var loader = new THREE.FBXLoader();
+				loader.load( 'models/sequoia.FBX', function ( object ) {
+					object.traverse( function ( child ) {
+					} );
+					object.position.y = 18;
+					object.position.x = 68;
+					object.position.z = 40;
+					object.rotation.y = 90*Math.PI / 90;
+					 object.scale.x = 0.1;
+					 object.scale.y = 0.1;
+					 object.scale.z = 0.1;
+					scene.add( object );
+				} );
+
+				///Prado model
+				var loader = new THREE.FBXLoader();
+				loader.load( 'models/car.fbx', function ( object ) {
+					object.traverse( function ( child ) {
+					} );
+					object.position.y = -47;
+					object.position.x = 128;
+					object.position.z = 50;
+					object.rotation.y = 90*Math.PI / 90;
+					 object.scale.x = 10;
+					 object.scale.y = 20;
+					 object.scale.z = 20;
+					scene.add( object );
+				} );
+					///Prado model
+					var loader = new THREE.FBXLoader();
+				loader.load( 'models/car2.fbx', function ( object ) {
+					object.traverse( function ( child ) {
+					} );
+					object.position.y = -24;
+					object.position.x = 152;
+					object.position.z = 50;
+					// object.rotation.y = 90*Math.PI / 90;
+					object.scale.x = 13.5;
+					 object.scale.y = 13.5;
+					 object.scale.z = 13.5;
+					scene.add( object );
+				} );
+				
+				
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 100, 0);
+				controls.update();
+				window.addEventListener( 'resize', onWindowResize, false );
+				// stats
+				stats = new Stats();
+				container.appendChild( stats.dom );
+			}
+
+// 		var raycaster = new THREE.Raycaster();
+// 		redraw = function(){
+// 			camera.position.set(-30, controls.cameraY, 30);
+// 			camera.lookAt(scene.position);
+// 			scene.children.forEach(function (child) {
+// 	if (child instanceof THREE.Mesh && child != plane)
+// child.material.color.copy(child.color);
+// });
+
+			
+// 			// new THREE.Vector3().copy(mouse).unproject(camera)
+// 		};
+// 		var direction = new THREE.Vector3()
+// 		.copy(mouse)
+// 		.unproject(camera)
+// 		.sub(camera.position)
+// 		.normalize();
+// 		raycaster.set(camera.position, direction);
+		
+// 		var intersects = raycaster.intersectObjects(scene.children);
+// 		intersects.forEach (function (element) {
+// 			var object = element.object;
+// 			if (object instanceof THREE.Mesh && object != plane)
+// 			object.material.color.set(0xffffff);
+// 		});
+// 		if (intersects,length > 0 ){
+// 		console.log(intersects);
+// 	}
+
+		raycaster.intersectObjects()
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+
+// 			function onDocumentMouseDown( event ) {
+
+// event.preventDefault();
+
+// var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
+// projector.unprojectVector( vector, camera );
+
+// var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+
+// var intersects = raycaster.intersectObjects( objects, true );
+
+// if ( intersects.length > 0 ) {
+// 						console.log("intersected");
+// 	intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+// 	var particle = new THREE.Sprite( particleMaterial );
+//                 particle.position = intersects[ 0 ].point;
+//                 particle.scale.x = particle.scale.y = 16;
+//                 scene.add( particle );
+// }
+// 			}
+			
+			function animate() {
+				requestAnimationFrame( animate );
+				var delta = clock.getDelta();
+				if ( mixer ) mixer.update( delta );
+				renderer.render( scene, camera );
+				stats.update();
+			}
+					// var ind = 20;
+
+// window.addEventListener("keyup", function (event) {
+// 	if (event.defaultPrevented) {
+// 		return; // Do nothing if the event was already processed
+// 	}
+
+// 	keyPressed = event.key;
+
+// 	// If the button pressed is "e" or "E" (using caps lock or shift), then the player jumps.
+
+// 	if (keyPressed == "d" || keyPressed == "D") {
+// 		// call your jump function.
+// 		object.position.x = ind;
+// 		ind = ind - 20;
+// 	}
+
+// 	if (keyPressed == "s" || keyPressed == "S") {
+// 		// call your jump function.
+// 		object.position.x = ind;
+// 		ind = ind + 30;
+// 	}
+
+// 	// Cancel the default action to avoid it being handled twice
+// 	event.preventDefault();
+// }, false);
+			
+		</script>
+
+	</body>
+</html>
+
