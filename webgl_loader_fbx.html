@@ -13,24 +13,30 @@
 		<script src="js/three.js"></script>
 		
 		<script src="js/inflate.min.js"></script>
-
+<script>alert("DCOR DEBUG 001- PROGRAM STARTED_01"); </script>
 		<script src="js/FBXLoader.js"></script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
 
 		<script src="js/OrbitControls.js"></script>
 
 		<script src="js/WebGL.js"></script>
 		<script src="js/stats.min.js"></script>
-
+<script>alert("DCOR DEBUG 002- PROGRAM STARTED_02 \n\n Did proper scripts load? - can\'t ascertain really."); </script>
 		<script>
-if ( WEBGL.isWebGLAvailable() === false ) {
+alert("DCOR DEBUG 003- MAIN PROGRAM STARTED_03"); 
+if ( WEBGL.isWebGLAvailable() === false ) {alert("DCOR DEBUG 0000- PROGRAM STARTED_ BUT WEBGL ISNOT AVAILABLE");
 				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 			}
+else if(WEBGL.isWebGLAvailable()==true){alert("DCOR DEBUG 0000- PROGRAM STARTED_ AND WEBGL IS AVAILABLE");}
+else{alert("DCOR DEBUG 0000- PROGRAM STARTED_ BUT WEBGL STATE COULD NOT BE ASCERTAINED");}
 			var container, stats, controls;
 			var camera, scene, renderer, light;
 			var clock = new THREE.Clock();
 			var mixer;
 			var keyPressed;
-		
+			var control;
 
 			
 			init();
@@ -50,7 +56,10 @@ if ( WEBGL.isWebGLAvailable() === false ) {
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 0, 30, 300 );
+				camera.position.set( 0, 60, 300 );
+					setTimeout(function(){
+				camera.position.set(0, 100, 300);
+			}, 3000);
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff , 200, 100 );
@@ -65,7 +74,7 @@ if ( WEBGL.isWebGLAvailable() === false ) {
 				light.shadow.camera.left = - 120;
 				light.shadow.camera.right = 120;
 				scene.add( light );
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				scene.add( new THREE.CameraHelper( light.shadow.camera ) );
 				// ground
 				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x709AA5, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
@@ -104,7 +113,7 @@ if ( WEBGL.isWebGLAvailable() === false ) {
 					 object.scale.z = 0.5;
 					scene.add( object );
 				} );
-				///Sequoia model
+				//Sequoia model
 				var loader = new THREE.FBXLoader();
 				loader.load( 'models/sequoia.FBX', function ( object ) {
 					object.traverse( function ( child ) {
@@ -119,7 +128,7 @@ if ( WEBGL.isWebGLAvailable() === false ) {
 					scene.add( object );
 				} );
 
-				///Prado model
+				//Prado model
 				var loader = new THREE.FBXLoader();
 				loader.load( 'models/car.fbx', function ( object ) {
 					object.traverse( function ( child ) {
@@ -141,7 +150,7 @@ if ( WEBGL.isWebGLAvailable() === false ) {
 					object.position.y = -24;
 					object.position.x = 152;
 					object.position.z = 50;
-					// object.rotation.y = 90*Math.PI / 90;
+			object.rotation.y = 90*Math.PI / 90;
 					object.scale.x = 13.5;
 					 object.scale.y = 13.5;
 					 object.scale.z = 13.5;
@@ -161,36 +170,60 @@ if ( WEBGL.isWebGLAvailable() === false ) {
 				// stats
 				stats = new Stats();
 				container.appendChild( stats.dom );
+				control = new function() {
+this.rotationSpeed = 0.005;
+this.opacity = 0.6;
+this.color = 0x086113;
+};
+addControlGui(control);
 			}
+			function addControlGui(controlObject) {
+var gui = new dat.GUI();
+gui.add(controlObject, 'rotationSpeed', -1, 1);
+gui.add(controlObject, 'opacity', 0.1, 1);
+gui.addColor(controlObject, 'color');
+}
+var controlObject = new function() {
+// Cadena CSS
+this.color0 = "#ffae23";
+// RGB array
+this.color1 = [ 0, 128, 255 ];
+// RGB con opacidad
+this.color2 = [ 0, 128, 255, 0.3 ];
+ Matiz, saturation, valor
+this.color3 = { h: 350, s: 0.9, v: 0.3 };
+};
+var gui = new dat.GUI();
+gui.addColor(text, 'color0');
+gui.addColor(text, 'color1');
+gui.addColor(text, 'color2');
+gui.addColor(text, 'color3');
+controlObject.visible=true;
+gui.add(controlObject, 'visible');
 
-// 		var raycaster = new THREE.Raycaster();
-// 		redraw = function(){
-// 			camera.position.set(-30, controls.cameraY, 30);
-// 			camera.lookAt(scene.position);
-// 			scene.children.forEach(function (child) {
-// 	if (child instanceof THREE.Mesh && child != plane)
-// child.material.color.copy(child.color);
-// });
 
-			
-// 			// new THREE.Vector3().copy(mouse).unproject(camera)
-// 		};
-// 		var direction = new THREE.Vector3()
-// 		.copy(mouse)
-// 		.unproject(camera)
-// 		.sub(camera.position)
-// 		.normalize();
-// 		raycaster.set(camera.position, direction);
+ 		var raycaster = new THREE.Raycaster();
+ 		redraw = function(){
+ 			camera.position.set(-30, controls.cameraY, 30);
+ 			camera.lookAt(scene.position);
+ 			scene.children.forEach(function (child) {
+ 	if (child instanceof THREE.Mesh && child != plane)
+ child.material.color.copy(child.color);
+ });
+ new THREE.Vector3().copy(mouse).unproject(camera)
+	};
+ 		var direction = new THREE.Vector3().copy(mouse).unproject(camera).sub(camera.position).normalize();
+ 		raycaster.set(camera.position, direction);
 		
-// 		var intersects = raycaster.intersectObjects(scene.children);
-// 		intersects.forEach (function (element) {
-// 			var object = element.object;
-// 			if (object instanceof THREE.Mesh && object != plane)
-// 			object.material.color.set(0xffffff);
-// 		});
-// 		if (intersects,length > 0 ){
-// 		console.log(intersects);
-// 	}
+ 		var intersects = raycaster.intersectObjects(scene.children);
+ 		intersects.forEach (function (element) {
+ 			var object = element.object;
+ 			if (object instanceof THREE.Mesh && object != plane)
+ 			object.material.color.set(0xffffff);
+ 		});
+ 		if (intersects,length > 0 ){
+ 		console.log(intersects);
+ 	}
 
 		raycaster.intersectObjects()
 			function onWindowResize() {
@@ -200,62 +233,77 @@ if ( WEBGL.isWebGLAvailable() === false ) {
 			}
 
 
-// 			function onDocumentMouseDown( event ) {
+ 			function onDocumentMouseDown( event ) {
 
-// event.preventDefault();
+ event.preventDefault();
 
-// var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
-// projector.unprojectVector( vector, camera );
+ var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
+ projector.unprojectVector( vector, camera );
 
-// var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+ var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 
-// var intersects = raycaster.intersectObjects( objects, true );
+ var intersects = raycaster.intersectObjects( objects, true );
 
-// if ( intersects.length > 0 ) {
-// 						console.log("intersected");
-// 	intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
-// 	var particle = new THREE.Sprite( particleMaterial );
-//                 particle.position = intersects[ 0 ].point;
-//                 particle.scale.x = particle.scale.y = 16;
-//                 scene.add( particle );
-// }
-// 			}
+ if ( intersects.length > 0 ) {
+ 						console.log("intersected");
+ 	intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+ 	var particle = new THREE.Sprite( particleMaterial );
+                 particle.position = intersects[ 0 ].point;
+                 particle.scale.x = particle.scale.y = 16;
+                 scene.add( particle );
+ }
+ 			}
 			
 			function animate() {
 				requestAnimationFrame( animate );
 				var delta = clock.getDelta();
 				if ( mixer ) mixer.update( delta );
+
+
 				renderer.render( scene, camera );
 				stats.update();
 			}
-					// var ind = 20;
+			function render() {
+var delta = clock.getDelta();
+var rotSpeed = delta*control.rotationSpeed;
+camera.position.x= camera.position.x * Math.cos(rotSpeed)
++ camera.position.z * Math.sin(rotSpeed);
+camera.position.z = camera.position.z * Math.cos(rotSpeed)
+- camera.position.x * Math.sin(rotSpeed);
+camera.lookAt(scene.position);
+var cube= scene.getObjectByName('cube').material
+cube.material.opacity = control.opacity;
+cube.material.color = new THREE.Color(control.color);
+requestAnimationFrame(render);
+renderer.render(scene, camera);
+}
+					 var ind = 20;
 
-// window.addEventListener("keyup", function (event) {
-// 	if (event.defaultPrevented) {
-// 		return; // Do nothing if the event was already processed
-// 	}
+ window.addEventListener("keyup", function (event) {
+ 	if (event.defaultPrevented) {
+ 		return; // Do nothing if the event was already processed
+ 	}
 
-// 	keyPressed = event.key;
+ 	keyPressed = event.key;
 
-// 	// If the button pressed is "e" or "E" (using caps lock or shift), then the player jumps.
+ 	// If the button pressed is "e" or "E" (using caps lock or shift), then the player jumps.
 
-// 	if (keyPressed == "d" || keyPressed == "D") {
-// 		// call your jump function.
-// 		object.position.x = ind;
-// 		ind = ind - 20;
-// 	}
+ 	if (keyPressed == "d" || keyPressed == "D") {
+ 		// call your jump function.
+ 		object.position.x = ind;
+	ind = ind - 20;
+ 	}
 
-// 	if (keyPressed == "s" || keyPressed == "S") {
-// 		// call your jump function.
-// 		object.position.x = ind;
-// 		ind = ind + 30;
-// 	}
+ 	if (keyPressed == "s" || keyPressed == "S") {
+ 		// call your jump function.
+ 		object.position.x = ind;
+ 		ind = ind + 30;
+ 	}
 
-// 	// Cancel the default action to avoid it being handled twice
-// 	event.preventDefault();
-// }, false);
-			
-		</script>
+	// Cancel the default action to avoid it being handled twice
+ 	event.preventDefault();
+ }, false);
+			alert("DCOR DEBUG 004- MAIN PROGRAM ENDED_04 - PROGRAM DEBUG SUCCESS"); 		</script>
 
 	</body>
 </html>
